@@ -107,7 +107,7 @@ def expr_to_diffsl(expr: Expr) -> str:
             raise TypeError(type(expr))
 
 
-class SystemBuilder:
+class DiffslSystemBuilder:
     def __init__(self):
         self.rhs_fn = None
         self.state_dict = {}
@@ -166,13 +166,13 @@ class SystemBuilder:
         return delim.join(codelines)
 
 
-def to_diffsl(
+def system_to_diffsl(
     rhs: Callable,
     state: dict[str, Number],
     params: dict[str, Number],
     newline: bool=True,
 ) -> str:
-    builder = SystemBuilder()
+    builder = DiffslSystemBuilder()
     for name, init in state.items():
         builder.state(name, init)
     for name, value in params.items():

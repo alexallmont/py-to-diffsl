@@ -1,23 +1,11 @@
-import diffsl as dsl
+import diffsl
+import matplotlib.pyplot as plt
 import numpy as np
 import pydiffsol as ds
 
-
-def minimal_system_builder_example():
-    def fn(x):
-        return [dsl.sin(1 + x)]
-
-    code = dsl.SystemBuilder() \
-        .rhs(fn) \
-        .state("x", 0) \
-        .param("y", 1) \
-        .to_diffsl()
-
-    print(code)
-
-
-def lotka_volterra_example():
-    code = dsl.to_diffsl(
+# Taken from Lotka-Volterra example https://pydiffsol.readthedocs.io/en/latest/examples/population_dynamics.html
+if __name__ == "__main__":
+    code = diffsl.system_to_diffsl(
         rhs=lambda y1, y2, a, b, c, d: [
             a * y1 - b * y1 * y2,
             c * y1 * y2 - d * y2,
@@ -27,9 +15,11 @@ def lotka_volterra_example():
     )
 
     ode = ds.Ode(code)
-    solution = ode.solve(np.array([]), 40.0)
-    print(solution.ys)
+    sol = ode.solve(np.array([]), 40.0)
 
-
-if __name__ == "__main__":
-    lotka_volterra_example()
+    fig, ax = plt.subplots()
+    ax.plot(sol.ts, sol.ys[0], label="prey")
+    ax.plot(sol.ts, sol.ys[1], label="predator")
+    ax.set_xlabel("t")
+    ax.set_ylabel("population")
+    fig.savefig("prey_predator.svg")
