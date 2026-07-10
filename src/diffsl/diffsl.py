@@ -140,10 +140,10 @@ class DiffslSystemBuilder:
         result = fn(*args)
         return ensure_exprs(result)
 
-    def to_diffsl(self, newline: bool=True) -> str:
+    def to_diffsl(self, newline: bool=True, indent_depth: int=4) -> str:
         if newline:
             delim = "\n"
-            indent = "  "
+            indent = " " * indent_depth
         else:
             delim = " "
             indent = ""
@@ -171,6 +171,7 @@ def system_to_diffsl(
     state: dict[str, Number],
     params: dict[str, Number],
     newline: bool=True,
+    indent_depth: int=4,
 ) -> str:
     builder = DiffslSystemBuilder()
     for name, init in state.items():
@@ -178,4 +179,4 @@ def system_to_diffsl(
     for name, value in params.items():
         builder.param(name, value)
     builder.rhs(rhs)
-    return builder.to_diffsl(newline=newline)
+    return builder.to_diffsl(newline=newline, indent_depth=indent_depth)
