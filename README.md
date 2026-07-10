@@ -1,11 +1,13 @@
 # Python to diffsl
 
-Prototype to trace python lowering into diffsl code (a la JAX).
+Prototype to trace Python (a la JAX) to lower into diffsl code.
 
-This is early experimental code; it's not clear yet if this can work with
-the tensor types and conditions that diffsl supports.
+This is experimental code and may not be released, as it it's not yet clear
+if this can work with the tensor types and conditions that diffsl supports.
 
-Lotka-Volterra example:
+## Lotka-Volterra example:
+
+Run with `PYTHONPATH=src/diffsl python examples/main.py`
 
 ```py
     code = diffsl.system_to_diffsl(
@@ -16,4 +18,5 @@ Lotka-Volterra example:
         state={"y1": 1, "y2": 1},
         params={"a": 2/3, "b": 4/3, "c": 1, "d": 1},
     )
+    print(code)
 ```

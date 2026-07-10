@@ -1,1 +1,7 @@
+__pycache__/
+.DS_Store/
+.git/
+.pytest_cache/
+.venv/
+
 prey_predator.svg
