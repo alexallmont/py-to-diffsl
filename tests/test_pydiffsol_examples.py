@@ -24,6 +24,6 @@ def test_pydiffsol_example_1_1_population_dynamics_solve():
             y2 = 1,
         }
         F_i {
-            ((a * y1) - ((b * y1) * y2)),
-            (((c * y1) * y2) - (d * y2)),
+            a * y1 - b * y1 * y2,
+            c * y1 * y2 - d * y2,
         }""")
