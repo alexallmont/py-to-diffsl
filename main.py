@@ -22,7 +22,7 @@ def lotka_volterra_example():
             a * y1 - b * y1 * y2,
             c * y1 * y2 - d * y2,
         ],
-        states={"y1": 1, "y2": 1},
+        state={"y1": 1, "y2": 1},
         params={"a": 2/3, "b": 4/3, "c": 1, "d": 1},
     )
 

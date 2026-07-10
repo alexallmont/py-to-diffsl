@@ -89,20 +89,20 @@ def exp(x): return Call("exp", (ensure_expr(x),))
 def log(x): return Call("log", (ensure_expr(x),))
 
 
-def to_diffsl(expr: Expr) -> str:
+def expr_to_diffsl(expr: Expr) -> str:
     match expr:
         case StateValue(name):
             return name
         case ParamValue(name):
             return name
         case Unary("-", arg):
-            return f"(-{to_diffsl(arg)})"
+            return f"(-{expr_to_diffsl(arg)})"
         case Unary(op, arg):
-            return f"{op}({to_diffsl(arg)})"
+            return f"{op}({expr_to_diffsl(arg)})"
         case Binary(op, lhs, rhs):
-            return f"({to_diffsl(lhs)} {op} {to_diffsl(rhs)})"
+            return f"({expr_to_diffsl(lhs)} {op} {expr_to_diffsl(rhs)})"
         case Call(func, args):
-            return f"{func}({', '.join(to_diffsl(a) for a in args)})"
+            return f"{func}({', '.join(expr_to_diffsl(a) for a in args)})"
         case _:
             raise TypeError(type(expr))
 
@@ -140,30 +140,42 @@ class SystemBuilder:
         result = fn(*args)
         return ensure_exprs(result)
 
-    def to_diffsl(self) -> str:
+    def to_diffsl(self, newline: bool=True) -> str:
+        if newline:
+            delim = "\n"
+            indent = "  "
+        else:
+            delim = " "
+            indent = ""
+
         codelines = []
         for name, init in self.param_dict.items():
             codelines.append(f"{name} {{ {init} }}")
 
         codelines.append("u_i {")
         for name, value in self.state_dict.items():
-            codelines.append(f"  {name} = {value},")
+            codelines.append(f"{indent}{name} = {value},")
         codelines.append("}")
 
         codelines.append("F_i {")
         rhs = self._trace(self.rhs_fn)
         for expr in rhs:
-            codelines.append(f"  {to_diffsl(expr)},")
+            codelines.append(f"{indent}{expr_to_diffsl(expr)},")
         codelines.append("}")
 
-        return "\n".join(codelines)
+        return delim.join(codelines)
 
 
-def to_diffsl(rhs: Callable, states: dict[str, Number], params: dict[str, Number]) -> str:
+def to_diffsl(
+    rhs: Callable,
+    state: dict[str, Number],
+    params: dict[str, Number],
+    newline: bool=True,
+) -> str:
     builder = SystemBuilder()
-    for name, init in states.items():
+    for name, init in state.items():
         builder.state(name, init)
     for name, value in params.items():
         builder.param(name, value)
     builder.rhs(rhs)
-    return builder.to_diffsl()
+    return builder.to_diffsl(newline=newline)
