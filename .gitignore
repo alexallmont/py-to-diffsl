@@ -1,7 +1,24 @@
+# Bytecode
 __pycache__/
-.DS_Store/
-.git/
-.pytest_cache/
-.venv/
+*.py[cod]
+
+# Build artifacts
+build/
+dist/
 *.egg-info/
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Virtual environments
+.venv/
+
+# OS metadata
+.DS_Store
+
+# Generated example output
 prey_predator.svg
