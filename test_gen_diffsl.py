@@ -9,4 +9,4 @@ def test_gen_diffsl_def():
         return y * sin(y + 2 + 5 * x)
 
     diffsl = gen_diffsl(fn)
-    assert  str(diffsl) == "(y * sin((y + 2) + (5 * x)))"
+    assert str(diffsl) == "(y * sin((y + 2) + (5 * x)))"
