@@ -23,22 +23,21 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
+      - name: Install uv and set up Python
+        uses: astral-sh/setup-uv@v8
         with:
           python-version: ${{ matrix.python-version }}
-          cache: pip
-          cache-dependency-path: pyproject.toml
+          enable-cache: true
 
-      - name: Install test and example dependencies
-        run: python -m pip install --editable ".[test,examples]"
+      - name: Install dependencies
+        run: uv sync --all-extras
 
       - name: Run unit tests
-        run: python -m pytest
+        run: uv run python -m pytest
 
       - name: Run example
         env:
           MPLBACKEND: Agg
-        run: python examples/main.py
+        run: uv run python examples/main.py
