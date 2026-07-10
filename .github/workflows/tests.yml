@@ -32,8 +32,13 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
 
-      - name: Install test dependencies
-        run: python -m pip install --editable ".[test]"
+      - name: Install test and example dependencies
+        run: python -m pip install --editable ".[test,examples]"
 
       - name: Run unit tests
         run: python -m pytest
+
+      - name: Run example
+        env:
+          MPLBACKEND: Agg
+        run: python examples/main.py
