@@ -3,5 +3,5 @@ __pycache__/
 .git/
 .pytest_cache/
 .venv/
-
+*.egg-info/
 prey_predator.svg
