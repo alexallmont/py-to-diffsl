@@ -7,7 +7,7 @@ def test_diffsl_system_builder():
         .param("y", 1) \
         .to_diffsl(newline=False)
 
-    assert code == "y { 1 } u_i { x = 0, } F_i { (sin(((1 + y) + (x * 5))) * x), }"
+    assert code == "y { 1 } u_i { x = 0, } F_i { sin(1 + y + x * 5) * x, }"
 
 def test_diffsl_to_diffsl():
     def fn(x, y):
@@ -20,4 +20,4 @@ def test_diffsl_to_diffsl():
         newline=False
     )
 
-    assert code == "y { 1 } u_i { x = 0, } F_i { (y * sin(((y + 2) + (5 * x)))), }"
+    assert code == "y { 1 } u_i { x = 0, } F_i { y * sin(y + 2 + 5 * x), }"

@@ -88,23 +88,40 @@ def cos(x): return Call("cos", (ensure_expr(x),))
 def exp(x): return Call("exp", (ensure_expr(x),))
 def log(x): return Call("log", (ensure_expr(x),))
 
+PRECEDENCE = {
+    "call": 100,
+    "unary": 90,
+    "**": 80,
+    "*": 70,
+    "/": 70,
+    "+": 60,
+    "-": 60,
+}
 
-def expr_to_diffsl(expr: Expr) -> str:
+def expr_to_diffsl(expr, parent_prec=0, is_right=False):
     match expr:
         case StateValue(name):
-            return name
+            s = name
+            prec = 100
         case ParamValue(name):
-            return name
-        case Unary("-", arg):
-            return f"(-{expr_to_diffsl(arg)})"
-        case Unary(op, arg):
-            return f"{op}({expr_to_diffsl(arg)})"
-        case Binary(op, lhs, rhs):
-            return f"({expr_to_diffsl(lhs)} {op} {expr_to_diffsl(rhs)})"
+            s = str(name)
+            prec = 100
         case Call(func, args):
-            return f"{func}({', '.join(expr_to_diffsl(a) for a in args)})"
+            s = f"{func}({', '.join(expr_to_diffsl(a) for a in args)})"
+            prec = PRECEDENCE["call"]
+        case Unary(op, arg):
+            s = f"{op}{expr_to_diffsl(arg, PRECEDENCE['unary'])}"
+            prec = PRECEDENCE["unary"]
+        case Binary(op, lhs, rhs):
+            prec = PRECEDENCE[op]
+            left = expr_to_diffsl(lhs, prec, False)
+            right = expr_to_diffsl(rhs, prec - 1 if op == "**" else prec, True)
+            s = f"{left} {op} {right}"
         case _:
             raise TypeError(type(expr))
+
+    need_parens = prec < parent_prec or (prec == parent_prec and is_right)
+    return f"({s})" if need_parens else s
 
 
 class DiffslSystemBuilder:
@@ -140,10 +157,10 @@ class DiffslSystemBuilder:
         result = fn(*args)
         return ensure_exprs(result)
 
-    def to_diffsl(self, newline: bool=True) -> str:
+    def to_diffsl(self, newline: bool=True, indent_depth: int=4) -> str:
         if newline:
             delim = "\n"
-            indent = "  "
+            indent = " " * indent_depth
         else:
             delim = " "
             indent = ""
@@ -171,6 +188,7 @@ def system_to_diffsl(
     state: dict[str, Number],
     params: dict[str, Number],
     newline: bool=True,
+    indent_depth: int=4,
 ) -> str:
     builder = DiffslSystemBuilder()
     for name, init in state.items():
@@ -178,4 +196,4 @@ def system_to_diffsl(
     for name, value in params.items():
         builder.param(name, value)
     builder.rhs(rhs)
-    return builder.to_diffsl(newline=newline)
+    return builder.to_diffsl(newline=newline, indent_depth=indent_depth)
